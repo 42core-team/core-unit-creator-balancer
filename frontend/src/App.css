@@ -1,5 +1,13 @@
 .App {
   text-align: center;
+  background-color: #282c34;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+* {
+  scrollbar-color: #e7d912 #1b1b18; /* thumb and track color */
+  scrollbar-width: thin; /* 'thin' or 'auto' or 'none' */
 }
 
 .App-logo {
@@ -36,3 +44,4 @@
     transform: rotate(360deg);
   }
 }
+
