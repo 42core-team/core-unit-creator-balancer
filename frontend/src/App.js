@@ -39,7 +39,7 @@ function App() {
       <Header weights={weights} setWeights={setWeights}/>
       <div class="unit-container">
         {units.map((unit, index) => (
-          <Unit key={index} unit={unit} index={index} setUnits={setUnits} weight={weights} setWeights={setWeights}/>
+          <Unit key={index} unit={unit} index={index} id={unit.id} setUnits={setUnits} weight={weights} setWeights={setWeights}/>
         ))}
       </div>
       <br></br>

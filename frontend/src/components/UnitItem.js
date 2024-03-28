@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './UnitItem.css'
 
-const UnitItem = ({unit, index, setUnits, weight}) =>
+const UnitItem = ({unit, index, setUnits, weight, id}) =>
 {
 
 	let name = unit.name || "Not Set";
@@ -10,23 +10,28 @@ const UnitItem = ({unit, index, setUnits, weight}) =>
 
 	const [speed, setSpeed] = useState(unit.speed || 0);
 	const speedChange = (e) => {
-		setSpeed(e.target.value);
-		unit.speed = e.target.value;
+		const newSpeed = e.target.value;
+		setSpeed(newSpeed);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, speed: newSpeed } : u));
 	}
 
 	const [damage, setDamage] = useState(unit.damage || 0);
 	const damageChange = (e) => {
-		setDamage(e.target.value);
-		unit.damage = e.target.value;
+		const newDamage = e.target.value;
+		setDamage(newDamage);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, damage: newDamage } : u));
 	}
 
 	const [hp, setHp] = useState(unit.hp || 0);
 	const hpChange = (e) => {
-		setHp(e.target.value);
-		unit.hp = e.target.value;
+		const newHp = e.target.value;
+		setHp(newHp);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, hp: newHp } : u));
 	}
 
 	const removeUnit = () => {
+
+		alert("For now for some reason this does weird things with the units in the list below, wehre the values will change weirdly so i would consider just not deleting it for now");
 
 		let deleteConfirm = window.confirm("Are you sure you want to remove this unit? \nThis cannot be undone and will not be saved anywhere!");
 		if(!deleteConfirm) return;
