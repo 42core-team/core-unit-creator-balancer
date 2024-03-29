@@ -4,7 +4,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import Header from "./components/Header";
 import { v4 as uuidv4 } from 'uuid';
-import SignIn from './components/SignIn';
+import { SignUp, SignIn } from './components/AccountAction';
 
 function App() {
 
@@ -37,7 +37,9 @@ function App() {
 
   return (
     <div className="App">
+      <SignUp />
       <SignIn />
+      <br></br>
       <Header weights={weights} setWeights={setWeights}/>
       <div class="unit-container">
         {units.map((unit, index) => (

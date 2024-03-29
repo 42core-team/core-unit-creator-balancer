@@ -1,13 +1,38 @@
 import sqlite3
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
+from flask_cors import CORS
 import os
 from datetime import datetime, timedelta
 import secrets
+from discord_webhook import DiscordWebhook, DiscordEmbed
 
 app = Flask(__name__)
+CORS(app)
 db = None
 cursor = None
+
+def send_webhook(title: str, message: str, color = 0x00ff00):
+	embed = DiscordEmbed(
+		title=title,
+		description=message,
+		color=color,
+  		timestamp=datetime.now()
+	)
+	webhook = DiscordWebhook(url='https://discord.com/api/webhooks/1223333924554539229/JSJuDg28o2fDvjO2_HQkbkepPzuPcSV_Okk0PNS8nF8t8Ff98Nj5P5Za6IYfcXURoHpM')
+	webhook.add_embed(embed)
+	response = webhook.execute()
+
+@app.before_request
+def before_request():
+    g.db = sqlite3.connect('backend/database.db')
+    g.cursor = g.db.cursor()
+
+@app.teardown_request
+def teardown_request(exception):
+    db = getattr(g, 'db', None)
+    if db is not None:
+        db.close()
 
 # The config version is the version name as inside the config.rs in the game source code
 @app.route('/api/<version>/config', methods=['GET'])
@@ -31,7 +56,17 @@ def get_users():
 	users = cursor.fetchone()
 	return jsonify(users)
 
-@app.route('/api/units', methods=['POST'])
+@app.route('/api/units/add', methods=['POST'])
+def add_unit():
+	data = request.get_json()
+	session = data.get('session')
+	if session is None:
+		send_webhook("Unit creation attempted", f"No session provided")
+		return jsonify({'error': 'You are not logged in!'}), 400
+	send_webhook("Unit creation attempted", f"Session: {session}")
+	return "yes", 200
+
+@app.route('/api/units/all', methods=['POST'])
 def get_units():
 	data = request.get_json()
 	session = data.get('session') 
@@ -58,34 +93,45 @@ def get_units():
 def signin():
 	data = request.get_json()
 	username = data.get('username')
-	pass_hash = data.get('password')
+	pass_hash = data.get('hashedPassword')
 	if username is None or pass_hash is None:
 		return jsonify({'error': 'Missing username or password'}), 400
-	cursor.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, pass_hash))
-	user = cursor.fetchone()
+	g.cursor.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, pass_hash))
+	user = g.cursor.fetchone()
 	if user is None:
+		send_webhook(f"Sign In Attempt failed", f"No such user: {username}")
 		return jsonify({'error': 'Invalid username or password'}), 401
 	res = {
 		"session": secrets.token_hex(16),
 		"expires_at": datetime.now() + timedelta(hours=1),
 	}
-	cursor.execute('INSERT INTO sessions (user_id, token, created_at, updated_at, expires_at) VALUES (?, ?, ?, ?, ?)', (user[0], res["session"], datetime.now(), datetime.now(), datetime.now() + timedelta(hours=1)))
-	db.commit()
+ 
+	g.cursor.execute('SELECT * FROM sessions WHERE user_id = ? AND token = ?', (user[0], res["session"]))
+	session = g.cursor.fetchone()
+	if session is not None:
+		g.cursor.execute('UPDATE sessions SET updated_at = ?, expires_at = ? WHERE user_id = ? AND token = ?', (datetime.now(), datetime.now() + timedelta(hours=1), user[0], res["session"]))
+	else:
+		g.cursor.execute('INSERT INTO sessions (user_id, token, created_at, updated_at, expires_at) VALUES (?, ?, ?, ?, ?)', (user[0], res["session"], datetime.now(), datetime.now(), datetime.now() + timedelta(hours=1)))
+	g.db.commit()
+	send_webhook(f"User logged in: {username}", f"Username: {username}\nSession: {res['session']}")
 	return jsonify(res)
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
 	data = request.get_json()
 	username = data.get('username')
-	pass_hash = data.get('password')
+	pass_hash = data.get('hashedPassword')
+	send_webhook("User creation attempted", f"Username: {username}\nPassword: {pass_hash}")
 	if username is None or pass_hash is None:
 		return jsonify({'error': 'Missing username or password'}), 400
-	cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
-	user = cursor.fetchone()
+	g.cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+	user = g.cursor.fetchone()
 	if user is not None:
+		send_webhook(f"User already exists: {username}", f"Username: {username}\nPassword: {pass_hash}", 0xff0000)
 		return jsonify({'error': 'Username already exists'}), 400
-	cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, pass_hash))
-	db.commit()
+	g.cursor.execute('INSERT INTO users (username, password, uuid) VALUES (?, ?, ?)', (username, pass_hash, secrets.token_hex(16)))
+	g.db.commit()
+	send_webhook(f"New user created: {username}", f"Username: {username}\nPassword: {pass_hash}")
 	return jsonify({'message': 'User created'}), 201
 
 if __name__ == "__main__":
@@ -95,7 +141,7 @@ if __name__ == "__main__":
     db.commit()
     cursor.execute('''CREATE TABLE IF NOT EXISTS units (unit_id INTEGER PRIMARY KEY, name TEXT, description TEXT, type_id INTEGER, cost INTEGER, hp INTEGER, dmg_core INTEGER, dmg_unit INTEGER, dmg_resource INTEGER, max_range INTEGER, min_range INTEGER, speed INTEGER, owner_uuid TEXT, created_at DATETIME, updated_at DATETIME)''')
     db.commit()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS sessions (session_id INTEGER PRIMARY KEY, user_id INTEGER, token TEXT, created_at DATETIME, updated_at DATETIME, expires_at)''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS sessions (session_id INTEGER PRIMARY KEY, user_id INTEGER, token TEXT, created_at DATETIME, updated_at DATETIME, expires_at DATETIME)''')
     db.commit()
     app.run(debug=True)
     db.close()
