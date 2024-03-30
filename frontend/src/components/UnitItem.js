@@ -57,7 +57,7 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 
 	useEffect(() => {
 		strenghtChange();
-	}, [speed, damage, hp]);
+	}, [speed, damage, hp, strenghtChange]);
 
 	const [cost, setCost] = useState(unit.cost || 0);
 	useEffect(() => {
@@ -88,6 +88,36 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 		navigator.clipboard.writeText(rustUnit);
 	}
 
+	const update_unit = async () => {
+
+		const response = await fetch('http://localhost:5000/api/units/add', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				session: sessionStorage.getItem('session'),
+				unit: {
+					id: unit.id || -1,
+					name: unit.name || "Not Set",
+					description: unit.description || "Not Set",
+					cost: unit.cost || -1,
+					hp: unit.hp || -1,
+					dmg_core: unit.dmg_core || -1,
+					dmg_unit: unit.dmg_unit || -1,
+					dmg_resource: unit.dmg_resource || -1,
+					max_range: unit.max_range || -1,
+					min_range: unit.min_range || -1,
+					speed: unit.speed || -1,
+				}
+			}),
+		});
+
+		const data = await response.json();
+		console.log("Updated unit:", data);
+
+	}
+
 	return(
 		<div className="unit-item">
 			<div class="unit-info">
@@ -109,6 +139,7 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 				<ul>
 					<button onClick={copyToClipboardRUST}>Copy as Rust</button>
 					<button onClick={copyToClipboardJSON}>Copy as JSON</button>
+					<button onClick={update_unit} style={{backgroundColor: 'green'}}>Save Changes</button>
 					<button onClick={removeUnit} style={{backgroundColor: 'red'}}>Remove Unit</button>
 				</ul>
 			</div>

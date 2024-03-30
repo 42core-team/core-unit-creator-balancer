@@ -46,25 +46,58 @@ def get_config(version):
 	else:
 		return jsonify({'error': f'No config for this version'}), 404
 
-@app.route('/api/user', methods=['POST'])
-def get_users():
-	data = request.get_json()
-	user_uuid = data.get('uuid') 
-	if user_uuid is None:
-		return jsonify({'error': 'You are not logged in!'}), 400
-	cursor.execute('SELECT * FROM users WHERE uuid = ?', (user_uuid,))
-	users = cursor.fetchone()
-	return jsonify(users)
+@app.route('/api/user/<username>/units', methods=['GET'])
+def get_user_units(username):
+	g.cursor.execute('SELECT * FROM users WHERE username = ?', (username,))	
+	user = g.cursor.fetchone()
+	if not user:
+		return jsonify({'error': 'No such user'}), 404
+	g.cursor.execute('SELECT * FROM units WHERE owner_uuid = ?', (user[3],))	
+	units = g.cursor.fetchall()	
+	if not units:
+		return jsonify({'error': 'No units found'}), 404
+	send_webhook(f"User units requested from {username}", f"Units: {units}")
+	return jsonify(units)
 
 @app.route('/api/units/add', methods=['POST'])
 def add_unit():
 	data = request.get_json()
 	session = data.get('session')
 	if session is None:
-		send_webhook("Unit creation attempted", f"No session provided")
 		return jsonify({'error': 'You are not logged in!'}), 400
-	send_webhook("Unit creation attempted", f"Session: {session}")
-	return "yes", 200
+	g.cursor.execute('SELECT * FROM sessions WHERE token = ?', (session,))
+	session = g.cursor.fetchone()
+	if session is None:
+		return jsonify({'error': 'Invalid session'}), 401
+	new_unit = data.get('unit')
+	if new_unit is None:
+		send_webhook("Unit creation attempted", f"No unit provided")
+		return jsonify({'error': 'No unit provided'}), 400
+	g.cursor.execute('SELECT * FROM users WHERE user_id = ?', (session[1],))
+	user = g.cursor.fetchone()
+	if user is None:
+		return jsonify({'error': 'No such user'}), 404
+	g.cursor.execute('SELECT * FROM units WHERE owner_uuid = ? AND name = ?', (user[3], new_unit.get('name')))
+	unit = g.cursor.fetchone()
+	if unit is not None:
+		g.cursor.execute('''
+		UPDATE units 
+		SET name = ?, description = ?, cost = ?, hp = ?, dmg_core = ?, dmg_unit = ?, dmg_resource = ?, max_range = ?, min_range = ?, speed = ?, updated_at = ?
+		WHERE owner_uuid = ? AND name = ?
+		''', (
+			new_unit["name"], new_unit["description"], new_unit["cost"], new_unit["hp"], new_unit["dmg_core"],
+			new_unit["dmg_unit"], new_unit["dmg_resource"], new_unit["max_range"], new_unit["min_range"], new_unit["speed"], datetime.now(),
+			user[3], new_unit["name"]
+		))
+		g.db.commit()
+		send_webhook(f"{user[1]} updated unit {new_unit['name']}", "")
+		return jsonify({'success': 'Unit updated'}), 400
+	g.cursor.execute('''INSERT INTO units (owner_uuid, name, description, cost, hp, dmg_core, dmg_unit, dmg_resource, max_range, min_range, speed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
+		user[3], new_unit.get("name"), new_unit.get("description"), new_unit.get("cost"), new_unit.get("hp"), new_unit.get("dmg_core"),
+     	new_unit.get("dmg_unit"), new_unit.get("dmg_resource"), new_unit.get("max_range"), new_unit.get("min_range"), new_unit.get("speed"), datetime.now(), datetime.now())
+    )
+	g.db.commit()
+	return jsonify({'success': f"unit added: {new_unit.get('name')}"}), 200
 
 @app.route('/api/units/all', methods=['POST'])
 def get_units():
