@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Header from "./components/Header";
 import { v4 as uuidv4 } from 'uuid';
 import { SignUp, SignIn } from './components/AccountAction';
+import { session } from 'electron';
 
 function App() {
 
@@ -34,6 +35,25 @@ function App() {
 
     setUnits([...units, { name, description, image_src, id: uuidv4(), weight: weights }]);
   };
+
+    // TODO: load own units from db when logged
+  useEffect(() => {
+
+    let username = sessionStorage.getItem('username');
+
+    if (!username) {
+      return;
+    }
+
+    fetch(`http://127.0.0.1:5000/api/user/${username}/units`)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+      })
+      .then(data => {
+        setUnits(data) }
+      );
+  }, []);
 
   return (
     <div className="App">

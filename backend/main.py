@@ -137,8 +137,8 @@ def signin():
 	res = {
 		"session": secrets.token_hex(16),
 		"expires_at": datetime.now() + timedelta(hours=1),
+		"username": username
 	}
- 
 	g.cursor.execute('SELECT * FROM sessions WHERE user_id = ? AND token = ?', (user[0], res["session"]))
 	session = g.cursor.fetchone()
 	if session is not None:
