@@ -5,6 +5,8 @@ If we want the page on github pages: https://github.com/gitname/react-gh-pages
 
 ## Frontend
 React
+looking ugly af rn but im not gonna change that before everything else works
 
 ## Backend (not used yet)
-Python Flask
+- saving units in database
+- accounts
