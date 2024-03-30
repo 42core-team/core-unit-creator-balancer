@@ -11,6 +11,7 @@
     "crypto-js": "^4.2.0",
     "gh-pages": "^6.1.1",
     "js-cookie": "^3.0.5",
+    "path-browserify": "^1.0.1",
     "primereact": "^10.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

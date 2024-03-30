@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import Header from "./components/Header";
 import { v4 as uuidv4 } from 'uuid';
 import { SignUp, SignIn } from './components/AccountAction';
-import { session } from 'electron';
 
 function App() {
 
