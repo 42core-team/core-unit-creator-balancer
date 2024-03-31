@@ -6,6 +6,7 @@ import os
 from datetime import datetime, timedelta
 import secrets
 from discord_webhook import DiscordWebhook, DiscordEmbed
+# from flask_login import login_required
 
 app = Flask(__name__)
 CORS(app)
@@ -59,6 +60,7 @@ def get_user_units(username):
 	send_webhook(f"User units requested from {username}", f"Units: {units}")
 	return jsonify(units)
 
+# @login_required
 @app.route('/api/units/add', methods=['POST'])
 def add_unit():
 	data = request.get_json()

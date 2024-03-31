@@ -15,19 +15,18 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, speed: newSpeed } : u));
 	}
 
-	const [damage, setDamage] = useState(unit.damage || 0);
-	const damageChange = (e) => {
-		const newDamage = e.target.value;
-		setDamage(newDamage);
-		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, damage: newDamage } : u));
-	}
-
 	const [hp, setHp] = useState(unit.hp || 0);
 	const hpChange = (e) => {
 		const newHp = e.target.value;
 		setHp(newHp);
 		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, hp: newHp } : u));
 	}
+
+	const [damage_unit, setDamageUnit] = useState(unit.dmg_unit || 0);
+	const [damage_core, setDamageCore] = useState(unit.dmg_core ||0);
+	const [damage_resource, setDamageResource] = useState(unit.dmg_resource || 0);
+	const [min_range, setMinRange] = useState(unit.min_range || 0);
+	const [max_range, setMaxRange] = useState(unit.max_range || 0);
 
 	const removeUnit = () => {
 
@@ -41,30 +40,59 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 	}
 
 	const [strenght, setStrenght] = useState(0);
-	const strenghtChange = () => {
-
+	useEffect(() => {
 		if(!weight) {
-			setStrenght(Number(speed) + Number(damage) + Number(hp));
+			setStrenght(Number(speed) + Number(damage_resource) + Number(hp) + Number(damage_core) + Number(damage_unit) + Number(max_range - min_range));
 			return;
 		}
 		
 		let speedVal = Number(speed) * Number(weight[0]);
-		let damageVal = Number(damage) * Number(weight[1]);
+		let damageVal = (Number(damage_core)  + Number(damage_unit) + Number(damage_resource)) * Number(weight[1]);
 		let hpVal = Number(hp) * Number(weight[2]);
+		let rageVal = (Number(max_range) - Number(min_range)) * Number(weight[0]);
 		
-		setStrenght(Number(speedVal) + Number(damageVal) + Number(hpVal));
-	}
-
-	useEffect(() => {
-		strenghtChange();
-	}, [speed, damage, hp, strenghtChange]);
+		setStrenght(Number(speedVal) + Number(damageVal) + Number(hpVal) + Number(rageVal));
+	}, [speed, damage_core, damage_unit, damage_resource, hp, weight, max_range, min_range]);
 
 	const [cost, setCost] = useState(unit.cost || 0);
 	useEffect(() => {
-		let cost = Math.floor(Number(strenght) / 10);
+		let cost = Math.floor(Number(strenght) / 100);
 		setCost(cost);
 		unit.cost = cost;
-	}, [strenght]);
+	}, [strenght, unit]);
+
+	useEffect(() => {
+		unit.dmg_unit = damage_unit;
+		unit.dmg_core = damage_core;
+		unit.dmg_resource = damage_resource;
+		unit.min_range = min_range;
+		unit.max_range = max_range;
+	}, [damage_unit, damage_core, damage_resource, min_range, max_range, unit]);
+
+	const damageUnitChange = (e) => {
+		setDamageUnit(e.target.value);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, dmg_unit: e.target.value } : u));
+	}
+
+	const damageCoreChange = (e) => {
+		setDamageCore(e.target.value);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, dmg_core: e.target.value } : u));
+	}
+
+	const damageResourceChange = (e) => {
+		setDamageResource(e.target.value);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, dmg_resource: e.target.value } : u));
+	}
+
+	const minRangeChange = (e) => {
+		setMinRange(e.target.value);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, min_range: e.target.value } : u));
+	}
+
+	const maxRangeChange = (e) => {
+		setMaxRange(e.target.value);
+		setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, max_range: e.target.value } : u));
+	}
 
 	const copyToClipboardJSON = () => {
 		console.log("Copying unit to clipboard:", JSON.stringify(unit))
@@ -129,18 +157,32 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 				<p>Current Strenght: {strenght}</p>
 				<p>Current Cost: {cost}</p>
 				<ul>
-					<p>Speed: ({speed})<input type="range" value={speed} onChange={speedChange}/></p>
-					<p>Damage: ({damage})<input type="range" value={damage} onChange={damageChange}/></p>
-					<p>HP: ({hp})<input type="range" value={hp} onChange={hpChange}/></p>
+					<p>Speed: ({speed})<input type="range" value={speed} min={100} max={100000} step={100} onChange={speedChange}/></p>
+					<p>HP: ({hp})<input type="range" value={hp} min={100} max={100000} step={100} onChange={hpChange}/></p>
+					<p>Damage Unit: ({damage_unit})<input type="range" value={damage_unit} min={100} max={100000} step={100} onChange={damageUnitChange}/></p>
+					<p>Damage Core: ({damage_core})<input type="range" value={damage_core} min={100} max={100000} step={100} onChange={damageCoreChange}/></p>
+					<p>Damage Resource: ({damage_resource})<input type="range" value={damage_resource} min={100} max={100000} step={100} onChange={damageResourceChange}/></p>
+					<p>Min Range: ({min_range})<input type="range" value={min_range} min={100} max={100000} step={100} onChange={minRangeChange}/></p>
+					<p>Max Range: ({max_range})<input type="range" value={max_range} min={100} max={100000} step={100} onChange={maxRangeChange}/></p>
 				</ul>
 			</div>
-			<img src={image_src} alt="No Unit image set"/>
+			<img src={image_src} alt="Unit Logo"/>
 			<div class="utils">
 				<ul>
 					<button onClick={copyToClipboardRUST}>Copy as Rust</button>
 					<button onClick={copyToClipboardJSON}>Copy as JSON</button>
+					<button onClick={
+						() => {
+							let newDescription = window.prompt("Enter new description:");
+							if(newDescription) {
+								unit.description = newDescription;
+								setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, description: newDescription } : u));
+							}
+						}
+					}>Change Description</button>
 					<button onClick={update_unit} style={{backgroundColor: 'green'}}>Save Changes</button>
 					<button onClick={removeUnit} style={{backgroundColor: 'red'}}>Remove Unit</button>
+					<p>Dont forget to save your changes!</p>
 				</ul>
 			</div>
 		</div>
