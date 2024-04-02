@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './UnitItem.css'
+import { Button } from '@material-ui/core';
 
 const UnitItem = ({unit, index, setUnits, weight, id}) =>
 {
@@ -166,22 +167,20 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 			</div>
 			<img src={image_src} alt="Unit Logo"/>
 			<div class="utils">
-				<ul>
-					<button onClick={copyToClipboardRUST}>Copy as Rust</button>
-					<button onClick={copyToClipboardJSON}>Copy as JSON</button>
-					<button onClick={
-						() => {
-							let newDescription = window.prompt("Enter new description:");
-							if(newDescription) {
-								unit.description = newDescription;
-								setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, description: newDescription } : u));
-							}
+				<p>Dont forget to save your changes!</p>
+				<Button style={{backgroundColor: 'white', color: 'black', width: '200px'}} onClick={copyToClipboardRUST}>Copy as Rust</Button>
+				<Button style={{backgroundColor: 'white', color: 'black', width: '200px'}} onClick={copyToClipboardJSON}>Copy as JSON</Button>
+				<Button style={{backgroundColor: 'white', color: 'black', width: '200px'}} onClick={
+					() => {
+						let newDescription = window.prompt("Enter new description:");
+						if(newDescription) {
+							unit.description = newDescription;
+							setUnits(prevUnits => prevUnits.map(u => u.id === unit.id ? { ...u, description: newDescription } : u));
 						}
-					}>Change Description</button>
-					<button onClick={update_unit} style={{backgroundColor: 'green'}}>Save Changes</button>
-					<button onClick={removeUnit} style={{backgroundColor: 'red'}}>Remove Unit</button>
-					<p>Dont forget to save your changes!</p>
-				</ul>
+					}
+				}>Change Description</Button>
+				<Button style={{backgroundColor: 'green', color: 'black', width: '200px'}} onClick={update_unit}>Save Changed</Button>				
+				<Button style={{backgroundColor: 'red', color: 'black', width: '200px'}} onClick={removeUnit}>Remove Unit</Button>
 			</div>
 		</div>
 	)

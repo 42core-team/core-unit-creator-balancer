@@ -11,7 +11,7 @@ function App() {
 
   const [units, setUnits] = useState([]);
   const [weights, setWeights] = useState([1, 1, 1])
-
+  
   // TODO: this has to be a in page modal box later
   const addUnit = () => {
     let name = window.prompt("Enter unit name:");
@@ -67,8 +67,7 @@ function App() {
       </div>
       <br></br>
       <div class="buttons">
-        {/* <Button variant="outlined">Outlined</Button> */}
-        <button onClick={() => { addUnit() }}>ADD UNIT</button>
+        <Button variant="outlined" style={{color: "white", borderColor: "white"}} onClick={() => {addUnit()}}>Outlined</Button>
       </div>
     </div>
   );

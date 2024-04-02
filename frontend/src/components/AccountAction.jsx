@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CryptoJS from 'crypto-js';
 import './AccountAction.css';
+import {TextField, Button} from '@material-ui/core';
 
 const SignUp = () => {
 
@@ -49,9 +50,14 @@ const SignUp = () => {
 			e.preventDefault();
 			performSignIn(username, password);
 		}}>
-			<input type="text" placeholder="Username" onChange={(e) => setUsername(e.target.value)} name="username" required />
+			<div className='textfieldgap'>
+				<TextField style={{color: "white", borderColor: "white", backgroundColor: "rgb(63, 63, 63)"}} id="filled-basic" label="Username" variant="filled" onChange={(e) => setUsername(e.target.value)} required/>
+				<TextField style={{color: "white", borderColor: "white", backgroundColor: "rgb(63, 63, 63)"}} id="filled-basic" label="Password" variant="filled" onChange={(e) => setPassword(e.target.value)} required/>
+				<Button style={{color: "darkgray", backgroundColor: "rgb(63, 63, 63)"}} type="submit" variant="contained" color="primary">Sign Up</Button>
+			</div>
+			{/* <input type="text" placeholder="Username" onChange={(e) => setUsername(e.target.value)} name="username" required />
 			<input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} name="password" required/>
-			<button type="submit">Sign Up</button>	
+			<button type="submit">Sign Up</button>	 */}
 		</form>
 		</div>
 	);
@@ -112,9 +118,14 @@ const SignIn = () => {
 			e.preventDefault();
 			performSignIn(username, password);
 		}}>
-			<input type="text" placeholder="Username" onChange={(e) => setUsername(e.target.value)} name="username" required />
-			<input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} name="password" required/>
-			<button type="submit">Sign In</button>	
+			<div className='textfieldgap'>
+				<TextField style={{color: "white", borderColor: "white", backgroundColor: "rgb(63, 63, 63)"}} id="filled-basic" label="Username" variant="filled" onChange={(e) => setUsername(e.target.value)} required/>
+				<TextField style={{color: "white", borderColor: "white", backgroundColor: "rgb(63, 63, 63)"}} id="filled-basic" label="Password" variant="filled" onChange={(e) => setPassword(e.target.value)} required/>
+				<Button style={{color: "darkgray", backgroundColor: "rgb(63, 63, 63)"}} type="submit" variant="contained" color="primary">Sign In</Button>
+			</div>
+			{/* <input type="text" placeholder="Username"  name="username" required />
+			<input type="password" placeholder="Password"  name="password" required/>
+			<button type="submit">Sign In</button>	 */}
 		</form>
 		</div>
 	);

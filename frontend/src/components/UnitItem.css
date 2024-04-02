@@ -36,3 +36,9 @@
 .unit-stats > p > input {
 	margin-left: auto;
 }
+
+.utils {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
