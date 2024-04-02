@@ -1,6 +1,5 @@
 import React from 'react'
 import './Header.css'
-import { useState, useEffect } from 'react';
 
 const Header = ({ weights, setWeights }) => {
 
@@ -13,7 +12,7 @@ const Header = ({ weights, setWeights }) => {
 			<p>HP: <input type="number" defaultValue={weights[2]} min={0} max={1} step={0.01} onChange={(e) => setWeights([weights[0], weights[1], e.target.value])}/></p>
 		</div>
 		</header>
-	)
-}
+	);
+};
 
 export default Header;

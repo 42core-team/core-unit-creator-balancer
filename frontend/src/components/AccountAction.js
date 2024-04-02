@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CryptoJS from 'crypto-js';
+import './AccountAction.css';
 
 const SignUp = () => {
 
@@ -43,7 +44,7 @@ const SignUp = () => {
 
 	return (
 		<div>
-		<h1>Sign Up</h1>
+		<h2 className="h2color">Sign Up</h2>
 		<form onSubmit={(e) => {
 			e.preventDefault();
 			performSignIn(username, password);
@@ -106,7 +107,7 @@ const SignIn = () => {
 
 	return (
 		<div>
-		<h1>Sign In</h1>
+		<h2 className='h2color'>Sign In</h2>
 		<form onSubmit={(e) => {
 			e.preventDefault();
 			performSignIn(username, password);

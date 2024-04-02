@@ -153,18 +153,16 @@ const UnitItem = ({unit, index, setUnits, weight, id}) =>
 				<h2>Description:</h2>
 				<p>{description}</p>
 			</div>
-			<div class="unit-stats">
+			<div className="unit-stats">
 				<p>Current Strenght: {strenght}</p>
 				<p>Current Cost: {cost}</p>
-				<ul>
-					<p>Speed: ({speed})<input type="range" value={speed} min={100} max={100000} step={100} onChange={speedChange}/></p>
-					<p>HP: ({hp})<input type="range" value={hp} min={100} max={100000} step={100} onChange={hpChange}/></p>
-					<p>Damage Unit: ({damage_unit})<input type="range" value={damage_unit} min={100} max={100000} step={100} onChange={damageUnitChange}/></p>
-					<p>Damage Core: ({damage_core})<input type="range" value={damage_core} min={100} max={100000} step={100} onChange={damageCoreChange}/></p>
-					<p>Damage Resource: ({damage_resource})<input type="range" value={damage_resource} min={100} max={100000} step={100} onChange={damageResourceChange}/></p>
-					<p>Min Range: ({min_range})<input type="range" value={min_range} min={100} max={100000} step={100} onChange={minRangeChange}/></p>
-					<p>Max Range: ({max_range})<input type="range" value={max_range} min={100} max={100000} step={100} onChange={maxRangeChange}/></p>
-				</ul>
+				<p>Speed: ({speed})<input type="range" value={speed} min={100} max={100000} step={100} onChange={speedChange}/></p>
+				<p>HP: ({hp})<input type="range" value={hp} min={100} max={100000} step={100} onChange={hpChange}/></p>
+				<p>Damage Unit: ({damage_unit})<input type="range" value={damage_unit} min={100} max={100000} step={100} onChange={damageUnitChange}/></p>
+				<p>Damage Core: ({damage_core})<input type="range" value={damage_core} min={100} max={100000} step={100} onChange={damageCoreChange}/></p>
+				<p>Damage Resource: ({damage_resource})<input type="range" value={damage_resource} min={100} max={100000} step={100} onChange={damageResourceChange}/></p>
+				<p>Min Range: ({min_range})<input type="range" value={min_range} min={100} max={100000} step={100} onChange={minRangeChange}/></p>
+				<p>Max Range: ({max_range})<input type="range" value={max_range} min={100} max={100000} step={100} onChange={maxRangeChange}/></p>
 			</div>
 			<img src={image_src} alt="Unit Logo"/>
 			<div class="utils">

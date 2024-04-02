@@ -4,7 +4,8 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import Header from "./components/Header";
 import { v4 as uuidv4 } from 'uuid';
-import { SignUp, SignIn } from './components/AccountAction';
+import { Signing } from './components/signinout';
+import Button from '@mui/material/Button';
 
 function App() {
 
@@ -56,8 +57,7 @@ function App() {
 
   return (
     <div className="App">
-      <SignUp />
-      <SignIn />
+      <Signing />
       <br></br>
       <Header weights={weights} setWeights={setWeights}/>
       <div class="unit-container">
@@ -67,6 +67,7 @@ function App() {
       </div>
       <br></br>
       <div class="buttons">
+        {/* <Button variant="outlined">Outlined</Button> */}
         <button onClick={() => { addUnit() }}>ADD UNIT</button>
       </div>
     </div>

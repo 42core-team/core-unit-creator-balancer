@@ -5,8 +5,8 @@
 	padding: 1rem;
 	margin: 1rem 0;
 	border: 1px solid #ccc;
-	border-radius: 5px;
-	background-color: coral;
+	border-radius: 10px;
+	background-color:rgb(51, 51, 51);
 }
 
 .unit-item img {
@@ -20,4 +20,19 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+}
+
+.unit-stats > p:nth-child(n+3) {
+	display: flex;
+	justify-content: space-between;
+	gap: 1vw;
+	align-items: center;
+}
+
+.unit-stats > p:nth-child(n+3) > input {
+	margin-left: auto;
+}
+
+.unit-stats > p > input {
+	margin-left: auto;
 }
