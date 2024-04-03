@@ -6,7 +6,7 @@ function Signing() {
 	return (
 		<div className="oneRow">
 			<SignIn />
-			<img src="../../public/pictures/Core.png" alt="Core Logo" />
+			<img style={{height: "100px", width: "100px"}} src="https://github.com/42core-team/core-unit-creator-balancer/blob/main/frontend/public/pictures/Core.png" alt="Core Logo" />
 			<SignUp />
 		</div>
 	);
