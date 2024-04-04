@@ -6,6 +6,7 @@ import os
 from datetime import datetime, timedelta
 import secrets
 from discord_webhook import DiscordWebhook, DiscordEmbed
+import schedule
 # from flask_login import login_required
 
 app = Flask(__name__)
@@ -34,6 +35,11 @@ def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
+
+def remove_session(session):
+	g.cursor.execute('DELETE FROM sessions WHERE token = ?', (session,))
+	g.db.commit()
+
 
 # The config version is the version name as inside the config.rs in the game source code
 @app.route('/api/<version>/config', methods=['GET'])
@@ -99,6 +105,7 @@ def add_unit():
      	new_unit.get("dmg_unit"), new_unit.get("dmg_resource"), new_unit.get("max_range"), new_unit.get("min_range"), new_unit.get("speed"), datetime.now(), datetime.now())
     )
 	g.db.commit()
+	send_webhook(f"{user[1]} created unit {new_unit['name']}", "")
 	return jsonify({'success': f"unit added: {new_unit.get('name')}"}), 200
 
 @app.route('/api/units/all', methods=['POST'])
@@ -145,7 +152,7 @@ def signin():
 	session = g.cursor.fetchone()
 	if session is not None:
 		g.cursor.execute('UPDATE sessions SET updated_at = ?, expires_at = ? WHERE user_id = ? AND token = ?', (datetime.now(), datetime.now() + timedelta(hours=1), user[0], res["session"]))
-	else:
+ 	else:
 		g.cursor.execute('INSERT INTO sessions (user_id, token, created_at, updated_at, expires_at) VALUES (?, ?, ?, ?, ?)', (user[0], res["session"], datetime.now(), datetime.now(), datetime.now() + timedelta(hours=1)))
 	g.db.commit()
 	send_webhook(f"User logged in: {username}", f"Username: {username}\nSession: {res['session']}")

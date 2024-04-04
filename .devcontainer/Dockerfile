@@ -17,6 +17,11 @@ COPY . .
 RUN apt-get update && apt-get install -y python3-pip && \
     pip3 install --no-cache-dir -r requirements.txt
 
+RUN npm uninstall react react-dom
+RUN npm install react@17.0.2 react-dom@17.0.2
+
+RUN npm install @mui/material@next --legacy-peer-deps
+
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
